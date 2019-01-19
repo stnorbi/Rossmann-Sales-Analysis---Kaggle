@@ -22,6 +22,7 @@ store_data=pd.read_csv(dataPath + "store.csv")
 train_data=pd.read_csv(dataPath + "train.csv", parse_dates=True, low_memory=False, index_col='Date')
 test_data=pd.read_csv(dataPath + "test.csv", parse_dates=True, low_memory=False, index_col='Date')
 
+print("="*50,"TRAIN DATA TABLE EXPLORATION","="*80,"\n")
 #Analys the feature of the train data set
 print("\n","Demensions of train set:",train_data.shape[0])
 
@@ -58,18 +59,34 @@ Exploration of missing values in train data:
 
 #Store data set exploration:
 #This table contain additional info about the stores
-print(store_data.head())
+print("="*50,"STORE DATA TABLE EXPLORATION","="*80,"\n")
+
+print("Head of store table:\n",store_data.head())
+
 
 #Explore missing values in store data:
 print("\nExplore missing values in store data:\n",store_data.isnull().sum())
+
+print("\nDescription of CompetitionDistance of store data:\n",store_data['CompetitionDistance'].describe())
 
 #Explore missing values in CompetitionDistance of Store table:
 print("\nExplore missing values in CompetitionDistance of store data:\n",store_data[pd.isnull(store_data.CompetitionDistance)])
 print("""
 The listed occurances are not following any pattern. They are simply missing from the data set / data base.
-In this case we can substitute the NaNs by the median as common practice to impute missing values.
+In this case we can substitute the NaNs by the median (almost half of the mean) as common practice to impute missing values.
 """)
 
+#Impute missing values in CompetitionDistance of Store table:
+store_data['CompetitionDistance'].fillna(store_data['CompetitionDistance'].median(), inplace =True)
 
-
+#Explore missing values in Promo2SinceWeek of Store table:
+missv_promo2SW=store_data[pd.isnull(store_data.Promo2SinceWeek)]
+print("\nExplore missing values in Promo2SinceWeek of store data:\n",missv_promo2SW.head())
+print("""
+As there is no Promo2, we do not have information about any further Promo related feature.
+At those points where there is no promotion compaign the values change to 0 from NaN.
+The same has been done with Competition related information except the CompetitionDistance,
+which was already treated.
+    """)
+store_data.fillna(0,inplace=True) #changing NaNs to 0 in store data
 
