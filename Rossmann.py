@@ -5,8 +5,16 @@ The chosen data set was downloaded from the following source:
     https://www.kaggle.com/c/rossmann-store-sales
 
 """
-import pandas as pd
 import os
+import warnings
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as seab
+
+
+# warnings.filterwarnings("ignore")
+
 
 #Extend the output window of IDE
 pd.set_option('display.height', 1000)
@@ -55,7 +63,10 @@ Exploration of missing values in train data:
     We can also explore such stores which were opened in the reporting period, but their sales was 0.
     The number of opened stores with null sales: {2}
     These stores was opened on working days. Assumption: External factor is behind this.
+    NOTE: THE CLOSED STORES WILL BE REMOVED FROM THE FURTHER ANALYSIS, NOT DESTORTING IT.
 """.format(nr_closed_stores,rate_closed_stores, nullsl_opened_stores))
+
+train_data=train_data[(train_data["Open"] != 0) & (train_data['Sales'] != 0)]
 
 #Store data set exploration:
 #This table contain additional info about the stores
@@ -89,4 +100,24 @@ The same has been done with Competition related information except the Competiti
 which was already treated.
     """)
 store_data.fillna(0,inplace=True) #changing NaNs to 0 in store data
+
+print("="*50,"SET TOGETHER THE TEST DATA WITH ADDITIONAL STORE DETAILS","="*80,"\n")
+
+print("""
+As in SQL practice joining tables is more handy and in the environment pandas package also
+allows inner join to put together the necessary data sets.
+""")
+joinData=pd.merge(train_data,store_data, how='inner', on='Store')
+print(joinData.shape)
+print(joinData.head())
+
+print("="*60,"STORE TYPE ANALYSIS","="*110,"\n")
+
+print("Description of Sales by Store Category:\n",joinData.groupby('StoreType')['Sales'].describe())
+print("""
+    AS we see in the description, "b" store type is the chempion based on average sale,
+    while its coverage is the smallest.
+""")
+
+print("\nSale and Attendance description:\n",joinData.groupby('StoreType')['Customers','Sales'].sum())
 
