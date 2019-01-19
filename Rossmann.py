@@ -121,3 +121,69 @@ print("""
 
 print("\nSale and Attendance description:\n",joinData.groupby('StoreType')['Customers','Sales'].sum())
 
+#Sale time series by Store Category and Promo
+seab.catplot(data = joinData, x = 'Month', y = "Sales",
+               col = 'StoreType', # per store type in cols
+               palette = 'plasma',
+               hue = 'StoreType',
+               row = 'Promo', # per promo in the store in rows
+               kind='point')
+
+print("""
+Figure 1:
+As we see the difference in scale was coming from the effect of the first promotion.
+""")
+
+#Sale time series by Customer
+seab.catplot(data = joinData, x = 'Month', y = "Sales_per_Cust",
+               col = 'StoreType', # per store type in cols
+               palette = 'plasma',
+               hue = 'StoreType',
+               row = 'Promo', # per promo in the store in rows
+               kind="point")
+
+print("""
+Figure 2:
+Based on the previous results it was seeming the B category stores are the most competitive, but
+taking into account the spent money of a customer category D is the winner.
+Category D has around 12$ with promotion and without 10$.
+The stage of category B is coming from the customer behaviours. Its customers buy cheap things or
+small quantities.
+""")
+
+#Customer trends by weekday
+seab.catplot(data = joinData, x = 'Month', y = "Sales",
+               col = 'DayOfWeek', # per store type in cols
+               palette = 'plasma',
+               hue = 'StoreType',
+               row = 'StoreType', # per store type in rows
+               kind = "point")
+print("""
+Figure 3:
+In the current plot shows stores of category C are not opened on Sunday.
+A strange / interesting aspect: stores of category D are closed on Sunday from October to December
+""")
+
+#Stores opened on Sunday
+print("\nSunday opened stores:\n",joinData[(joinData.Open == 1) & (joinData.DayOfWeek == 7)]['Store'].unique())
+
+# monthly open of competition
+joinData['CompetitionOpen'] = 12 * (joinData.Year - joinData.CompetitionOpenSinceYear) + \
+                                 (joinData.Month - joinData.CompetitionOpenSinceMonth)
+
+# Promo opens
+joinData['PromoOpen'] = 12 * (joinData.Year - joinData.Promo2SinceYear) + \
+                           (joinData.WeekofYear - joinData.Promo2SinceWeek) / 4.0
+
+# replace NA's by 0
+joinData.fillna(0, inplace=True)
+
+# average PromoOpen time and CompetitionOpen time per store type
+print("\nAverage PromoOpen time and CompetitionOpen time per store type:\n",\
+      joinData.loc[:, ['StoreType', 'Sales', 'Customers', 'PromoOpen', 'CompetitionOpen']].groupby('StoreType').mean(),\
+      "\nWhile store type A is the most crowded, it is not in danger because of competitors. Category B has \n"
+      "the most extensive competition on store average. B also runs the longest period of promotion."
+      )
+
+plt.show()
+
