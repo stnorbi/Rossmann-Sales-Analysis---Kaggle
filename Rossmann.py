@@ -11,7 +11,7 @@ import warnings
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as seab
-
+import xlsxwriter
 
 # warnings.filterwarnings("ignore")
 
@@ -185,5 +185,10 @@ print("\nAverage PromoOpen time and CompetitionOpen time per store type:\n",\
       "the most extensive competition on store average. B also runs the longest period of promotion."
       )
 
-plt.show()
+#save result into excel sheet:
+writer=pd.ExcelWriter("Rossmann_Final.xlsx")
+joinData.to_excel(writer,'Sheet1',engine='xlsxwriter')
+writer.save()
 
+
+plt.show()
