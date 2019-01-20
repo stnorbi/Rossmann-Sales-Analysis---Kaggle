@@ -12,6 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as seab
 import xlsxwriter
+import numpy as np
 
 # warnings.filterwarnings("ignore")
 
@@ -127,7 +128,7 @@ seab.catplot(data = joinData, x = 'Month', y = "Sales",
                palette = 'plasma',
                hue = 'StoreType',
                row = 'Promo', # per promo in the store in rows
-               kind='point')
+               kind='point').savefig("Figure_1.png")
 
 print("""
 Figure 1:
@@ -140,7 +141,7 @@ seab.catplot(data = joinData, x = 'Month', y = "Sales_per_Cust",
                palette = 'plasma',
                hue = 'StoreType',
                row = 'Promo', # per promo in the store in rows
-               kind="point")
+               kind="point").savefig("Figure_2.png")
 
 print("""
 Figure 2:
@@ -157,7 +158,7 @@ seab.catplot(data = joinData, x = 'Month', y = "Sales",
                palette = 'plasma',
                hue = 'StoreType',
                row = 'StoreType', # per store type in rows
-               kind = "point")
+               kind = "point").savefig("Figure_3.png")
 print("""
 Figure 3:
 In the current plot shows stores of category C are not opened on Sunday.
@@ -181,14 +182,59 @@ joinData.fillna(0, inplace=True)
 # average PromoOpen time and CompetitionOpen time per store type
 print("\nAverage PromoOpen time and CompetitionOpen time per store type:\n",\
       joinData.loc[:, ['StoreType', 'Sales', 'Customers', 'PromoOpen', 'CompetitionOpen']].groupby('StoreType').mean(),\
-      "\nWhile store type A is the most crowded, it is not in danger because of competitors. Category B has \n"
-      "the most extensive competition on store average. B also runs the longest period of promotion."
+      "\nWhile store type 'A' is the most crowded, it is not in danger because of competitors. Category B has \n"
+      "the most extensive competition on store average. B also runs the longest period of promotion.\n"
       )
 
 #save result into excel sheet:
-writer=pd.ExcelWriter("Rossmann_Final.xlsx")
-joinData.to_excel(writer,'Sheet1',engine='xlsxwriter')
-writer.save()
+# writer=pd.ExcelWriter("Rossmann_Final.xlsx")
+# joinData.to_excel(writer,'Sheet1',engine='xlsxwriter')
+# writer.save()
 
 
-plt.show()
+print("="*60,"CORRELATION ANALYSIS","="*110,"\n")
+
+#Correlation matrix without taking into acount "Opene":
+correlation_matrix=joinData.drop('Open',axis=1).corr()
+print("Correlation Matrix:\n",correlation_matrix)
+
+# Taking the half of the correlation matrix
+triangle=np.zeros_like(correlation_matrix, dtype=np.bool)
+triangle[np.triu_indices_from(triangle)]=True
+
+#Plot the heatmap of correlation matrix
+f, ax=plt.subplots(figsize=(11,9))
+
+seab.heatmap(correlation_matrix,mask=triangle, square=True, linewidths= 0.7, ax=ax, cmap="Greens")
+print("""
+Figure 4:
+In the heatmap of the correlation we can focuse on the relation of the Promo compaigns and the
+number of customers. As it is seen the performance of the first promo compaign was better than
+the second one, because the correlation between the first compaign and the sale per customer is
+positive (More than 0.5). The relation between the first compaign and number of customers makes
+this fact more obvious by a strong correlation (about 0.8). 
+An other fact is the compaigns are getting weaker day by day within a week (The correlation is negative
+between DayOfWeek and the promotion in the stores.
+""")
+plt.savefig("Figure_4.png")
+
+
+# Customer trends by Promotion
+seab.catplot(data = joinData, x = 'DayOfWeek', y = "Sales",
+               col = 'Promo',
+               row = 'Promo2',
+               hue = 'Promo2',
+               palette = 'RdBu',
+               kind='point').savefig("Figure_5.png")
+
+print("""
+Figure 5:
+AS deeper analysis of the German Rossmann promotion campaigns it can be said Sunday has peek
+without any promotion (NOTE: CATEGORY C IS CLOSED ON SUNDAYS).
+Ultimately, the first campaign brought the most revenue on Mondays with intensive reduction in
+the rest of the weeks.
+The second (Promo2) campaign played the weakest role, because it did not bring so much in respect
+to the first campaign.
+The two campaign together performed almost as the first campaign individually. It means the first 
+campaign supported the performance of Promo2.
+""")
