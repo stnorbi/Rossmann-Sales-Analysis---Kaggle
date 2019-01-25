@@ -1,5 +1,4 @@
 """
-The current analysis has been prepared for an interview as presentation to a board of team leaders.
 The chosen data set was downloaded from the following source:
 
     https://www.kaggle.com/c/rossmann-store-sales
