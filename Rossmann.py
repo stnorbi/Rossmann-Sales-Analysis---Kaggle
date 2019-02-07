@@ -47,10 +47,10 @@ train_data['Sales_per_Cust']=train_data['Sales']/train_data['Customers']
 print("\n Description of Sales per Customers:\n",train_data['Sales_per_Cust'].describe())
 print("""
 Descriptive Statistics:
-    As the description shows the average customer spend amount is 9.5$, however we have days
-    when some store is closed. Less than 25% of the customer spend 7.9$ on average and
-    more than 75% of them spend 10.9$. The maximum spend amount of a customer on average was
-    64.95$ on average.\n""")
+    As the description shows the average customer spend amount is 9.5€, however we have days
+    when some store is closed. Less than 25% of the customer spend 7.9€ on average and
+    more than 75% of them spend 10.9€. The maximum spend amount of a customer on average was
+    64.95€ on average.\n""")
 
 #Explore missing values in train data:
 nr_closed_stores=len(train_data[(train_data.Open==0) & (train_data.Sales==0)])
@@ -146,7 +146,7 @@ print("""
 Figure 2:
 Based on the previous results it was seeming the B category stores are the most competitive, but
 taking into account the spent money of a customer category D is the winner.
-Category D has around 12$ with promotion and without 10$.
+Category D has around 12€ with promotion and without 10€.
 The stage of category B is coming from the customer behaviours. Its customers buy cheap things or
 small quantities.
 """)
